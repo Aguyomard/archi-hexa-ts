@@ -1,0 +1,44 @@
+docker exec -it nodejs-docker-test-mongo-1 mongosh
+show dbs
+
+
+
+docker-compose down -v
+docker-compose up --build
+
+
+docker-compose down -v  # Arrête les conteneurs et supprime les volumes (optionnel mais recommandé)
+docker-compose up --build
+
+
+query myFirstQuery($name: String) {
+  hello(name: "Alec")
+  goodBye(name: $name)
+  age
+  weight
+  isOver18
+  hobbies
+}
+
+query {
+  me {
+    id
+    name
+    email
+    age
+  }
+}
+
+
+npm run prisma:docker:migrate:dev -- --name test
+
+
+
+probleme windows
+docker run -it --rm -v %cd%/frontend:/app -w /app node:20-alpine sh
+C’est :
+Créer un container temporaire basé sur l’image node:20-alpine
+Monter ton dossier ./frontend (même s’il est vide) dans /app
+Travailler dans ce container pour y faire un npm create vue@latest
+Et ensuite, ce container sera supprimé (--rm)
+Donc même si ton service frontend: dans docker-compose.yml échoue au build, ça ne bloque pas du tout cette commande.

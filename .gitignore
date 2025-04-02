@@ -1,0 +1,24 @@
+# 🗂 Ignorer les dépendances Node.js
+node_modules
+npm-debug.log
+
+# ⚙️ Ignorer les fichiers Docker temporaires
+docker-compose.override.yml
+.dockerignore
+
+# 🔑 Ignorer les fichiers sensibles
+.env
+*.env.local
+
+# 🏗 Ignorer les fichiers de build
+dist
+build
+coverage
+
+# 💻 Ignorer les fichiers spécifiques aux IDE
+.vscode
+.idea
+.DS_Store
+
+
+.env
