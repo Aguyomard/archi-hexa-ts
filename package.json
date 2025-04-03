@@ -16,7 +16,8 @@
     "prisma:docker:migrate:dev": "docker compose exec app npx prisma migrate dev",
     "prisma:docker:migrate:deploy": "docker compose exec app npx prisma migrate deploy",
     "prisma:docker:migrate:test": "docker compose exec app ./scripts/prisma-migrate-test.sh",
-    "db:test:reset": "docker compose exec app ./scripts/prisma-reset-test.sh"
+    "db:test:reset": "docker compose exec app ./scripts/prisma-reset-test.sh",
+    "hello": "tsx src/cli.ts hello"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +25,7 @@
   "dependencies": {
     "@prisma/client": "^6.5.0",
     "bcryptjs": "^3.0.2",
+    "commander": "^13.1.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
