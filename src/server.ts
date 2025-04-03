@@ -6,8 +6,8 @@ import cors from 'cors'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 
-import connectDB from './config/db.js'
-import postgresPool from './config/postgres.js'
+// import connectDB from './config/db.js'
+// import postgresPool from './config/postgres.js'
 
 const app = express()
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000
@@ -50,10 +50,10 @@ app.get('/test', (req, res) => {
 
 const startServer = async () => {
   try {
-    await connectDB()
+    // await connectDB()
 
-    await postgresPool.query('SELECT 1')
-    console.log('✅ PostgreSQL connecté avec succès !')
+    // await postgresPool.query('SELECT 1')
+    // console.log('✅ PostgreSQL connecté avec succès !')
 
     app.listen(PORT, () => {
       console.log(`🚀 Server is running on http://localhost:${PORT}`)
