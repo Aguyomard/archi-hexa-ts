@@ -28,14 +28,14 @@ program
     new Command('post')
       .argument('<user>', 'the current user')
       .argument('<message>', 'the message to post')
-      .action((user, message) => {
+      .action(async (user, message) => {
         const postMessageCommand: PostMessageCommand = {
           id: 'some-message-id',
           author: user,
           text: message,
         }
         try {
-          postMessageUseCase.handle(postMessageCommand)
+          await postMessageUseCase.handle(postMessageCommand)
           console.log('✅ Message posté')
           console.table(messageRepository)
 
