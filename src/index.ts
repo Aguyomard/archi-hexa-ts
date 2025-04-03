@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import { Command } from 'commander'
-import { InMemoryMessageRepository } from './message.inmemory.repository'
 import {
   DateProvider,
   PostMessageCommand,
   PostMessageUseCase,
 } from './post-message.usecase'
+import { FileSystemMessageRepository } from './message.fs.repository'
 
 class RealDateProvider implements DateProvider {
   getNow(): Date {
@@ -13,7 +13,7 @@ class RealDateProvider implements DateProvider {
   }
 }
 
-const messageRepository = new InMemoryMessageRepository()
+const messageRepository = new FileSystemMessageRepository()
 const dateProvider = new RealDateProvider()
 const postMessageUseCase = new PostMessageUseCase(
   messageRepository,
