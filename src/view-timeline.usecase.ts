@@ -1,6 +1,7 @@
 import { MessageRepository } from './message.repository'
 import { DateProvider } from './post-message.usecase'
 
+const ONE_MINUTE = 60 * 1000
 export class ViewTimelineUseCase {
   constructor(
     private readonly messageRepository: MessageRepository,
@@ -30,7 +31,7 @@ export class ViewTimelineUseCase {
   private publicationTime(publishedAt: Date): string {
     const now = this.dateProvider.getNow()
     const diff = now.getTime() - publishedAt.getTime()
-    const minutes = Math.floor(diff / (60 * 1000))
+    const minutes = Math.floor(diff / ONE_MINUTE)
     if (minutes < 1) {
       return 'less than a minute'
     }
