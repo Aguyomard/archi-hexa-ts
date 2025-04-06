@@ -1,3 +1,4 @@
+import { EditMessageCommand, EditMessageUseCase } from '../edit-message.usecase'
 import { Message } from '../message'
 import { InMemoryMessageRepository } from '../message.inmemory.repository'
 import { PostMessageCommand, PostMessageUseCase } from '../post-message.usecase'
@@ -7,16 +8,17 @@ import { ViewTimelineUseCase } from '../view-timeline.usecase'
 export const createMessagingFixture = () => {
   const dateProvider = new StubDateProvider()
   const messageRepository = new InMemoryMessageRepository()
-  const postMessageUseCase = new PostMessageUseCase(
-    messageRepository,
-    dateProvider
-  )
   let thrownError: Error
   let timeline: {
     author: string
     text: string
     publicationTime: string
   }[]
+  const postMessageUseCase = new PostMessageUseCase(
+    messageRepository,
+    dateProvider
+  )
+  const editMessageUseCase = new EditMessageUseCase(messageRepository)
   const viewTimelineUseCase = new ViewTimelineUseCase(
     messageRepository,
     dateProvider
@@ -39,17 +41,23 @@ export const createMessagingFixture = () => {
         }
       }
     },
+    async whenUserEditsMessage(editMessageCommand: EditMessageCommand) {
+      try {
+        await editMessageUseCase.handle(editMessageCommand)
+      } catch (err) {
+        if (err instanceof Error) {
+          thrownError = err
+        } else {
+          throw new Error('Caught non-Error value')
+        }
+      }
+    },
     async whenUserSeesTheTimelineOf(user: string) {
       timeline = await viewTimelineUseCase.handle({ user })
     },
-    async whenUserEditsMessage(editMessageCommand: {
-      messageId: string
-      text: string
-    }) {},
-    thenMessageShouldBe(expectedMessage: Message) {
-      expect(expectedMessage).toEqual(
-        messageRepository.getMessageById(expectedMessage.id)
-      )
+    async thenMessageShouldBe(expectedMessage: Message) {
+      const message = await messageRepository.getById(expectedMessage.id)
+      expect(message).toEqual(expectedMessage)
     },
     thenErrorShouldBe(expectedErrorClass: new () => Error) {
       expect(thrownError).toBeInstanceOf(expectedErrorClass)
