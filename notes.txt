@@ -48,5 +48,5 @@ Donc même si ton service frontend: dans docker-compose.yml échoue au build, ç
 
 
 
-/app # tsx src/index.ts post alice "Bonjour tout le monde"
+/app # tsx src/index.ts post alice "aveclavalue?"
 /app # tsx src/index.ts view alice
