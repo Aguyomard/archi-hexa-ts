@@ -33,10 +33,10 @@ export class ViewTimelineUseCase {
     const diff = now.getTime() - publishedAt.getTime()
     const minutes = Math.floor(diff / ONE_MINUTE)
     if (minutes < 1) {
-      return 'less than a minute'
+      return 'less than a minute ago'
     }
     if (minutes < 2) {
-      return '1 minutes ago'
+      return '1 minute ago'
     }
     return `${minutes} minutes ago`
   }

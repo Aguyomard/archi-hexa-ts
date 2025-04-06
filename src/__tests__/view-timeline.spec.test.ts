@@ -1,45 +1,40 @@
-import { InMemoryMessageRepository } from '../message.inmemory.repository'
-import { ViewTimelineUseCase } from '../view-timeline.usecase'
-import { Message } from '../message'
-import { StubDateProvider } from '../stub-date-provider'
+import { messageBuilder } from './message.builder'
+import { createMessagingFixture, MessagingFixture } from './messaging.fixture'
 
 describe('Feature: Viewing a personnal timeline', () => {
-  let fixture: Fixture
+  let fixture: MessagingFixture
 
   beforeEach(() => {
-    fixture = createFixture()
+    fixture = createMessagingFixture()
   })
 
   describe('Rule: Messages are shown in reverse chronological order', () => {
-    test('Alice can view the 2 messages she published in her timeline', async () => {
+    test('Alice can view the 3 messages she published in her timeline', async () => {
+      const aliceMessageBuilder = messageBuilder().authoredBy('Alice')
       fixture.givenTheFollowingMessagesExist([
-        {
-          author: 'Alice',
-          text: 'Hello World 1',
-          id: 'message-id-1',
-          publishedAt: new Date('2023-01-20T19:28:00.000Z'),
-        },
-        {
-          author: 'Bob',
-          text: 'Hello World 2',
-          id: 'message-id-2',
-          publishedAt: new Date('2023-01-20T19:29:00.000Z'),
-        },
-        {
-          author: 'Alice',
-          text: 'Hello World 3',
-          id: 'message-id-3',
-          publishedAt: new Date('2023-01-20T19:30:00.000Z'),
-        },
-        {
-          author: 'Alice',
-          text: 'My last message',
-          id: 'message-id-4',
-          publishedAt: new Date('2023-01-20T19:30:30.000Z'),
-        },
+        aliceMessageBuilder
+          .withId('message-1')
+          .withText('My first message')
+          .publishedAt(new Date('2023-02-07T16:27:59.000Z'))
+          .build(),
+        messageBuilder()
+          .authoredBy('Bob')
+          .withId('message-2')
+          .withText("Hi it's Bob")
+          .publishedAt(new Date('2023-02-07T16:29:00.000Z'))
+          .build(),
+        aliceMessageBuilder
+          .withId('message-3')
+          .withText('How are you all ?')
+          .publishedAt(new Date('2023-02-07T16:30:00.000Z'))
+          .build(),
+        aliceMessageBuilder
+          .withId('message-4')
+          .withText('My last message')
+          .publishedAt(new Date('2023-02-07T16:30:30.000Z'))
+          .build(),
       ])
-
-      fixture.givenNowIs(new Date('2023-01-20T19:31:00.000Z'))
+      fixture.givenNowIs(new Date('2023-02-07T16:31:00.000Z'))
 
       await fixture.whenUserSeesTheTimelineOf('Alice')
 
@@ -47,57 +42,19 @@ describe('Feature: Viewing a personnal timeline', () => {
         {
           author: 'Alice',
           text: 'My last message',
-          publicationTime: 'less than a minute',
+          publicationTime: 'less than a minute ago',
         },
         {
           author: 'Alice',
-          text: 'Hello World 3',
-          publicationTime: '1 minutes ago',
+          text: 'How are you all ?',
+          publicationTime: '1 minute ago',
         },
         {
           author: 'Alice',
-          text: 'Hello World 1',
+          text: 'My first message',
           publicationTime: '3 minutes ago',
         },
       ])
     })
   })
 })
-
-const createFixture = () => {
-  let timeline: {
-    author: string
-    text: string
-    publicationTime: string
-  }[]
-  const dateProvider = new StubDateProvider()
-
-  const messageRepository = new InMemoryMessageRepository()
-  const viewTimelineUseCase = new ViewTimelineUseCase(
-    messageRepository,
-    dateProvider
-  )
-
-  return {
-    givenTheFollowingMessagesExist(messages: Message[]) {
-      messageRepository.givenExistingMessages(messages)
-    },
-    givenNowIs(now: Date) {
-      dateProvider.now = now
-    },
-    async whenUserSeesTheTimelineOf(user: string) {
-      timeline = await viewTimelineUseCase.handle({ user })
-    },
-    thenUserShouldSee(
-      expectedTimeline: {
-        author: string
-        text: string
-        publicationTime: string
-      }[]
-    ) {
-      expect(timeline).toEqual(expectedTimeline)
-    },
-  }
-}
-
-type Fixture = ReturnType<typeof createFixture>
