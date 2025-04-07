@@ -1,5 +1,5 @@
-import { Message } from './message'
-import { MessageRepository } from './message.repository'
+import { MessageRepository } from '../application/secondaryPorts/message.repository'
+import { Message } from '../domain/message'
 
 export class InMemoryMessageRepository implements MessageRepository {
   messages = new Map<string, Message>()

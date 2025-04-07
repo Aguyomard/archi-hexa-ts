@@ -9,5 +9,5 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src", "src/index.ts"]
+  "include": ["src", "src/interface/cli/index.ts"]
 }

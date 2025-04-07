@@ -1,14 +1,11 @@
-import { Message } from './message'
-import { MessageRepository } from './message.repository'
+import { Message } from '../../domain/message'
+import { DateProvider } from '../secondaryPorts/dateProvider'
+import { MessageRepository } from '../secondaryPorts/message.repository'
 
 export type PostMessageCommand = {
   id: string
   text: string
   author: string
-}
-
-export interface DateProvider {
-  getNow(): Date
 }
 
 export class PostMessageUseCase {

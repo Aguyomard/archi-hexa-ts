@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 import { Command } from 'commander'
 import {
-  DateProvider,
   PostMessageCommand,
   PostMessageUseCase,
-} from './post-message.usecase'
-import { FileSystemMessageRepository } from './message.fs.repository'
-import { ViewTimelineUseCase } from './view-timeline.usecase'
-import { EditMessageCommand, EditMessageUseCase } from './edit-message.usecase'
+} from '../../application/usecases/post-message.usecase'
+import { FileSystemMessageRepository } from '../../infra/message.fs.repository'
+import { DateProvider } from '../../application/secondaryPorts/dateProvider'
+import {
+  EditMessageCommand,
+  EditMessageUseCase,
+} from '../../application/usecases/edit-message.usecase'
+import { ViewTimelineUseCase } from '../../application/usecases/view-timeline.usecase'
 
 class RealDateProvider implements DateProvider {
   getNow(): Date {
@@ -15,7 +18,13 @@ class RealDateProvider implements DateProvider {
   }
 }
 
-const messageRepository = new FileSystemMessageRepository()
+import * as path from 'path'
+import { fileURLToPath } from 'url'
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const testMessagesPath = path.join(__dirname, './message.json')
+
+const messageRepository = new FileSystemMessageRepository(testMessagesPath)
 const dateProvider = new RealDateProvider()
 const postMessageUseCase = new PostMessageUseCase(
   messageRepository,

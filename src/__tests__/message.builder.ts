@@ -1,4 +1,4 @@
-import { Message } from '../message'
+import { Message } from '../domain/message'
 export const messageBuilder = ({
   id = 'message-id',
   author = 'Author',
