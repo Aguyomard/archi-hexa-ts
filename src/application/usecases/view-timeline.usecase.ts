@@ -1,7 +1,7 @@
+import { Timeline } from '../services/timeline'
 import { DateProvider } from '../secondaryPorts/dateProvider'
 import { MessageRepository } from '../secondaryPorts/message.repository'
 
-const ONE_MINUTE = 60 * 1000
 export class ViewTimelineUseCase {
   constructor(
     private readonly messageRepository: MessageRepository,
@@ -17,27 +17,8 @@ export class ViewTimelineUseCase {
   > {
     const messagesOfUser = await this.messageRepository.getAllOfUser(user)
 
-    messagesOfUser.sort((a, b) => {
-      return b.publishedAt.getTime() - a.publishedAt.getTime()
-    })
+    const timeline = new Timeline(messagesOfUser, this.dateProvider.getNow())
 
-    return messagesOfUser.map((message) => ({
-      author: message.author,
-      text: message.text,
-      publicationTime: this.publicationTime(message.publishedAt),
-    }))
-  }
-
-  private publicationTime(publishedAt: Date): string {
-    const now = this.dateProvider.getNow()
-    const diff = now.getTime() - publishedAt.getTime()
-    const minutes = Math.floor(diff / ONE_MINUTE)
-    if (minutes < 1) {
-      return 'less than a minute ago'
-    }
-    if (minutes < 2) {
-      return '1 minute ago'
-    }
-    return `${minutes} minutes ago`
+    return timeline.data
   }
 }

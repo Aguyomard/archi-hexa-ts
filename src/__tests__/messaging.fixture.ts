@@ -77,6 +77,7 @@ export const createMessagingFixture = () => {
     ) {
       expect(timeline).toEqual(expectedTimeline)
     },
+    messageRepository,
   }
 }
 

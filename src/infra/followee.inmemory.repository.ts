@@ -23,7 +23,7 @@ export class InMemoryFolloweeRepository implements FolloweeRepository {
     this.followeesByUser.set(followee.user, existingFollowees)
   }
 
-  getFolloweesOf(user: string): string[] {
-    return this.followeesByUser.get(user) ?? []
+  getFolloweesOf(user: string): Promise<string[]> {
+    return Promise.resolve(this.followeesByUser.get(user) ?? [])
   }
 }
