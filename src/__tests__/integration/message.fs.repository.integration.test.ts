@@ -1,9 +1,12 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { FileSystemMessageRepository } from '../infra/message.fs.repository'
-import { messageBuilder } from './message.builder'
+import { FileSystemMessageRepository } from '../../infra/message.fs.repository'
+import { messageBuilder } from '../message.builder'
 
-const testMessagesPath = path.join(__dirname, './../../tmp/messages-test.json')
+const testMessagesPath = path.join(
+  __dirname,
+  './../../../tmp/messages-test.json'
+)
 
 describe('FileSystemMessageRepository', () => {
   beforeEach(async () => {

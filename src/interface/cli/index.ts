@@ -11,6 +11,14 @@ import {
   EditMessageUseCase,
 } from '../../application/usecases/edit-message.usecase'
 import { ViewTimelineUseCase } from '../../application/usecases/view-timeline.usecase'
+import * as path from 'path'
+import { fileURLToPath } from 'url'
+import { FileSystemFolloweeRepository } from '../../infra/followee.fs.repository'
+import {
+  FollowUserCommand,
+  FollowUserUseCase,
+} from '../../application/usecases/follow-user.usecase'
+import { ViewWallUseCase } from '../../application/usecases/view-wall.usecase'
 
 class RealDateProvider implements DateProvider {
   getNow(): Date {
@@ -18,13 +26,13 @@ class RealDateProvider implements DateProvider {
   }
 }
 
-import * as path from 'path'
-import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const testMessagesPath = path.join(__dirname, './message.json')
-
 const messageRepository = new FileSystemMessageRepository(testMessagesPath)
+const followeeRepository = new FileSystemFolloweeRepository(
+  path.join(__dirname, './followee.json')
+)
 const dateProvider = new RealDateProvider()
 const postMessageUseCase = new PostMessageUseCase(
   messageRepository,
@@ -33,6 +41,12 @@ const postMessageUseCase = new PostMessageUseCase(
 const editMessageUseCase = new EditMessageUseCase(messageRepository)
 const viewTimelineUseCase = new ViewTimelineUseCase(
   messageRepository,
+  dateProvider
+)
+const followUserUseCase = new FollowUserUseCase(followeeRepository)
+const viewWallUseCase = new ViewWallUseCase(
+  messageRepository,
+  followeeRepository,
   dateProvider
 )
 
@@ -93,6 +107,34 @@ program
           console.error('❌', err)
           process.exit(1)
         }
+      })
+  )
+  .addCommand(
+    new Command('follow')
+      .argument('<user>', 'the user to follow')
+      .argument('<followee>', 'the user to follow')
+      .action(async (user, followee) => {
+        const followUserCommand: FollowUserCommand = {
+          user,
+          userToFollow: followee,
+        }
+        try {
+          await followUserUseCase.handle(followUserCommand)
+          console.log('✅ Followed')
+          process.exit(0)
+        } catch (err) {
+          console.error('❌', err)
+          process.exit(1)
+        }
+      })
+  )
+  .addCommand(
+    new Command('wall')
+      .argument('<user>', 'the user to view the wall of')
+      .action(async (user) => {
+        const wall = await viewWallUseCase.handle({ user })
+        console.table(wall)
+        process.exit(0)
       })
   )
 

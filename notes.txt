@@ -51,3 +51,4 @@ Donc même si ton service frontend: dans docker-compose.yml échoue au build, ç
 /app # tsx src/index.ts post alice "test value"
 /app # tsx src/interface/cli/index.ts view alice
 /app # tsx src/index.ts view alice
+/app # tsx src/interface/cli/index.ts follow alice Bob
