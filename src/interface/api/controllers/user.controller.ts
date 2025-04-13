@@ -26,14 +26,11 @@ import {
   TimelineOutputDTO,
   TimelineMessageDTO,
 } from '../../../application/dtos/timeline.dto'
-import {
-  WallOutputDTO,
-  WallMessageDTO,
-} from '../../../application/dtos/wall.dto'
 import { validateDTO } from '../../../shared/validation/dto.validator'
 import { createUserSchema } from '../../../application/dtos/validation/create-user.schema'
 import { followUserSchema } from '../../../application/dtos/validation/follow-user.schema'
 import { userParamSchema } from '../../../application/dtos/validation/user-param.schema'
+import { WallPresenter } from '../presenters/wall.presenter'
 
 // Initialize repositories and provider
 const prismaUserRepository = new PrismaUserRepository()
@@ -55,6 +52,9 @@ const viewWallUseCase = new ViewWallUseCase(
   prismaFolloweeRepository,
   dateProvider
 )
+
+// Initialize presenters
+const wallPresenter = new WallPresenter()
 
 export class UserController {
   async createUser(req: Request, res: Response): Promise<Response> {
@@ -178,20 +178,17 @@ export class UserController {
         user: userParamDto.user,
       })
 
-      const messages: WallMessageDTO[] = wallData.map((msg) => ({
-        messageId: `msg-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        user: msg.author,
-        text: msg.text,
-        timestamp: new Date(),
-      }))
+      // Récupérer la liste des utilisateurs suivis
+      const following = await prismaFolloweeRepository.getFolloweesOf(
+        userParamDto.user
+      )
 
-      const following: string[] = []
-
-      const outputDto: WallOutputDTO = {
-        user: userParamDto.user,
-        messages,
-        following,
-      }
+      // Utiliser le presenter pour formater la réponse
+      const outputDto = wallPresenter.present(
+        wallData,
+        userParamDto.user,
+        following
+      )
 
       return res.status(200).json(outputDto)
     } catch (err) {
