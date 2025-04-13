@@ -1,57 +1,25 @@
-import { PrismaClient } from '../generated/client'
-import { PrismaFolloweeRepository } from '../followee.prisma.repository'
-import { execSync } from 'child_process'
-import { GenericContainer, StartedTestContainer, Wait } from 'testcontainers'
-import { Followee } from '../../../application/secondaryPorts/followee.repository'
+import { PrismaClient } from '../../infra/prisma/generated/client'
+import { PrismaFolloweeRepository } from '../../infra/prisma/followee.prisma.repository'
+import { Followee } from '../../application/secondaryPorts/followee.repository'
+import {
+  TestDatabase,
+  setupTestDatabase,
+  teardownTestDatabase,
+} from './test-utils'
 
 describe('PrismaFolloweeRepository Integration Tests', () => {
-  let container: StartedTestContainer
+  let testDb: TestDatabase
   let prisma: PrismaClient
   let repository: PrismaFolloweeRepository
-  let connectionString: string
 
   beforeAll(async () => {
-    // Démarrage d'un conteneur PostgreSQL pour les tests
-    container = await new GenericContainer('postgres:16')
-      .withExposedPorts(5432)
-      .withEnvironment({
-        POSTGRES_USER: 'testuser',
-        POSTGRES_PASSWORD: 'testpass',
-        POSTGRES_DB: 'testdb',
-      })
-      .withWaitStrategy(
-        Wait.forLogMessage('database system is ready to accept connections')
-      )
-      .start()
-
-    // Récupérer l'adresse et le port mappé
-    const host = container.getHost()
-    const port = container.getMappedPort(5432)
-
-    // Construire la chaîne de connexion pour Prisma
-    connectionString = `postgresql://testuser:testpass@${host}:${port}/testdb`
-
-    // Définir la variable d'environnement pour Prisma
-    process.env.DATABASE_URL = connectionString
-
-    // Créer les tables avec prisma db push
-    try {
-      execSync('npx prisma db push --force-reset', {
-        env: process.env,
-        stdio: 'inherit',
-      })
-    } catch (error) {
-      console.error('Error running prisma db push:', error)
-    }
-
-    // Initialiser le client Prisma et le repository
-    prisma = new PrismaClient()
+    testDb = await setupTestDatabase()
+    prisma = testDb.prisma
     repository = new PrismaFolloweeRepository()
   }, 60000) // Augmenter le timeout pour le démarrage du conteneur
 
   afterAll(async () => {
-    await prisma.$disconnect()
-    await container.stop()
+    await teardownTestDatabase(testDb)
   })
 
   beforeEach(async () => {
