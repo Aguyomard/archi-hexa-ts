@@ -20,3 +20,19 @@ model Client {
   name  String
   age   Int
 }
+
+model User {
+  name       String    @id @db.VarChar(20)
+  Message    Message[]
+  followedBy User[]    @relation("UserFollows")
+  following  User[]    @relation("UserFollows")
+  userId     String?
+}
+
+model Message {
+  id          String   @id
+  author      User     @relation(fields: [authorId], references: [name])
+  authorId    String
+  text        String
+  publishedAt DateTime
+}

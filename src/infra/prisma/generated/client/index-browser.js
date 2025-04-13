@@ -124,6 +124,18 @@ exports.Prisma.ClientScalarFieldEnum = {
   age: 'age'
 };
 
+exports.Prisma.UserScalarFieldEnum = {
+  name: 'name',
+  userId: 'userId'
+};
+
+exports.Prisma.MessageScalarFieldEnum = {
+  id: 'id',
+  authorId: 'authorId',
+  text: 'text',
+  publishedAt: 'publishedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -134,9 +146,16 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 
 exports.Prisma.ModelName = {
-  Client: 'Client'
+  Client: 'Client',
+  User: 'User',
+  Message: 'Message'
 };
 
 /**
