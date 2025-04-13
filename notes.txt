@@ -48,9 +48,17 @@ Donc même si ton service frontend: dans docker-compose.yml échoue au build, ç
 
 
 
-/app # tsx src/index.ts post alice "test value"
+/app # tsx src/interface/cli/index.ts post alice "test value2"
 /app # tsx src/interface/cli/index.ts view alice
 /app # tsx src/index.ts view alice
 /app # tsx src/interface/cli/index.ts follow alice Bob
 
+
+tsx src/interface/cli/prisma-cli.ts post Alice "Mon message avec Prisma"
+
+
 npx prisma migrate dev --name userandmessage
+
+
+  npm test -- -t "should handle multiple followees for a user"
+  node --inspect-brk node_modules/.bin/jest src/__tests__/integration/followee.prisma.repository.integration.test.ts -t "should handle multiple followees for a user" --runInBand
