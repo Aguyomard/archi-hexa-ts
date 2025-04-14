@@ -30,7 +30,7 @@ import { validateDTO } from '../../../shared/validation/dto.validator'
 import { createUserSchema } from '../../../application/dtos/validation/create-user.schema'
 import { followUserSchema } from '../../../application/dtos/validation/follow-user.schema'
 import { userParamSchema } from '../../../application/dtos/validation/user-param.schema'
-import { WallPresenter } from '../presenters/wall.presenter'
+import { WallPresenterImpl } from '../presenters/wall.presenter.impl'
 
 // Initialize repositories and provider
 const prismaUserRepository = new PrismaUserRepository()
@@ -39,6 +39,9 @@ const prismaMessageRepository = new PrismaMessageRepository()
 const dateProvider: DateProvider = {
   getNow: () => new Date(),
 }
+
+// Initialize presenters
+const wallPresenter = new WallPresenterImpl()
 
 // Initialize use cases
 const createUserUseCase = new CreateUserUseCase(prismaUserRepository)
@@ -50,11 +53,9 @@ const viewTimelineUseCase = new ViewTimelineUseCase(
 const viewWallUseCase = new ViewWallUseCase(
   prismaMessageRepository,
   prismaFolloweeRepository,
-  dateProvider
+  dateProvider,
+  wallPresenter
 )
-
-// Initialize presenters
-const wallPresenter = new WallPresenter()
 
 export class UserController {
   async createUser(req: Request, res: Response): Promise<Response> {
@@ -174,21 +175,10 @@ export class UserController {
         userParamSchema
       )
 
-      const wallData = await viewWallUseCase.handle({
+      // Exécuter le use case qui utilise maintenant directement le presenter
+      const outputDto = await viewWallUseCase.handle({
         user: userParamDto.user,
       })
-
-      // Récupérer la liste des utilisateurs suivis
-      const following = await prismaFolloweeRepository.getFolloweesOf(
-        userParamDto.user
-      )
-
-      // Utiliser le presenter pour formater la réponse
-      const outputDto = wallPresenter.present(
-        wallData,
-        userParamDto.user,
-        following
-      )
 
       return res.status(200).json(outputDto)
     } catch (err) {
